@@ -1,0 +1,133 @@
+#include<iostream>
+using namespace std;
+
+/* It takes the input from the user, divides the data by the generator, and checks for errors */
+class CRC
+{
+public:
+    int num_frame, num_gen, frame[20], gen[10], temp[20], b;
+    char a;
+/**
+ * It takes the dividend, the generator, the dividend array, and the generator array as parameters and
+ * returns the remainder
+ * 
+ * @param n length of the data
+ * @param g length of generator
+ * @param temp The array that contains the data bits and the appended zeros.
+ * @param gen Generator polynomial
+ * 
+ * @return The remainder of the division.
+ */
+    int *divide(int n, int g, int temp[10], int gen[10])
+    {
+        for (int i = 0; i < n; i++)
+        {
+            if (gen[0] == temp[i])
+            {
+                for (int j = 0, k = i; j < g + 1; j++, k++)
+                {
+                    if (temp[k] ^ gen[j] == 1)
+                        temp[k] = 1;
+                    else
+                        temp[k] = 0;
+                }
+            }
+        }
+        return temp;
+    }
+/**
+ * It takes the input from the user and stores it in the array
+ */
+    void input()
+    {
+        cout << "Frame Length:";
+        cin >> num_frame;
+        cout << "Frame:";
+        for (int i = 0; i < num_frame; i++)
+        {
+            cin >> frame[i];
+            temp[i] = frame[i];
+        }
+        cout << "Generator Length:";
+        cin >> num_gen;
+        cout << "Enter your generator:";
+        for (int i = 0; i < num_gen; i++)
+        {
+            cin >> gen[i];
+        }
+        num_gen--;
+        for (int i = 0; i < num_gen; i++)
+        {
+            temp[num_frame + i] = 0;
+        }
+    }
+    /**
+     * The function takes the number of frames, the number of generators, the temporary array, and the
+     * generator array as parameters and returns the sender array
+     */
+    void sender()
+    {
+        int *sender;
+        sender = divide(num_frame, num_gen, temp, gen);
+        cout << endl
+             << "Sender's Side\n"
+             << "CRC:";
+        for (int i = 0; i < num_gen; i++)
+        {
+            frame[num_frame + i] = sender[num_frame + i];
+            cout << sender[num_frame + i] << ' ';
+        }
+        cout << endl
+             << "Transmitted Frame:";
+        for (int i = 0; i < num_frame + num_gen; i++)
+            cout << frame[i] << ' ';
+        cout << endl;
+    }
+    /**
+     * It takes the input from the user and changes the bit at the position specified by the user
+     * 
+     * @return the value of the variable receiver.
+     */
+    int receiver()
+    {
+        int *receiver;
+        cout << "\nReceiver's Side\n"
+             << "Received message:";
+        for (int i = 0; i < num_frame + num_gen; i++)
+            cout << frame[i] << ' ';
+        cout << endl;
+        cout << "Enter which bit you want to change (from 0-" << num_frame + num_gen << ")-";
+        cin >> b;
+        if (frame[b] == 1)
+            frame[b] = 0;
+        else
+            frame[b] = 1;
+        receiver = divide(num_frame, num_gen, frame, gen);
+        cout << "Error:";
+        for (int i = 0; i < num_frame + num_gen; i++)
+        {
+            if (receiver[i] != 0)
+            {
+                cout << "Error Detected!!" << endl;
+                return 0;
+            }
+        }
+        cout << "No Error detected!" << endl;
+    }
+};
+
+/**
+ * The function takes a string of bits and returns a string of bits that is the same length as the
+ * input string, but with the parity bits added
+ * 
+ * @return The CRC is being returned.
+ */
+int main()
+{
+/* Calling the functions in the class. */
+    CRC o;
+    o.input();
+    o.sender();
+    o.receiver();
+    return 0;
+}
