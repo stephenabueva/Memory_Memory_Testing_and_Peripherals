@@ -1,0 +1,154 @@
+#include<iostream>
+#include<algorithm>
+using namespace std;
+
+
+//Function to find the 1's complement of the given binary
+/**
+ * It takes a string of 0s and 1s and returns the string with all the 0s and 1s flipped
+ * 
+ * @param s The string to be operated on.
+ * 
+ * @return The string s is being returned.
+ */
+string oc(string s)
+{
+    for(int i=0;i<s.length();i++){
+        if(s[i]=='0')
+            s[i]='1';
+        else
+            s[i]='0'  
+    }
+    return s;
+}
+
+//main process
+int main(){
+    string s;
+    string r;
+    int block_size;
+
+    cout<<"Sent Message: ";
+    cin>>s;
+
+    cout<<"Received Message: "
+    cin>>r;
+
+    cout<<"Block Size";
+    cin>>block_size;
+
+    if(chkr(s,r,block_size)){
+        cout<<"No Error";
+    }
+    else{
+        cout<<"Error";
+    }
+    return 0;
+}
+
+//Function to return the checksum value of the given string when divided in size blocks
+/**
+ * It takes a string of binary digits and a block size, and returns the checksum of the string
+ * 
+ * @param d the data
+ * @param block The number of bits in a block.
+ * 
+ * @return The checksum of the data.
+ */
+string chksm(string d, int block){
+    int m=d.length();
+    int i,j,sum,carry,k,l;
+
+    if(m%block!=0){
+        int size=block-(m%block);
+        for(i=0;i<size;i++){
+            d='0'+d;
+        }
+    }
+
+    string result="";
+
+    for(i=0;i<size;i++){
+        result+=d[i];
+    }
+
+    for(i=block;i<m;i+=block){
+        string next_block="";
+
+        for(j=i;j<i+block;j++){
+            next_block+=d[j];
+        }
+
+        string add="";
+        sum=0;
+        carry=0;
+
+        for(k=block-1;k>=0;k--){
+            sum+=(next_block[k]-'0')+(result-'0');
+            carry=sum/2;
+            if(sum==0){
+                add='0'+add;
+                sum=carry;
+            }
+            else if(sum==1){
+                add='1'+add;
+                sum=carry;
+            }
+            else if(sum==2){
+                add='0'+add;
+                sum=carry;
+            }
+            else{
+                add='1'+add;
+                sum=carry;
+            }
+        }
+
+        string f="";
+
+        if(carry==1){
+            for(l=add.length()-1;l>=0;l--){
+                if(carry==0){
+                    f=add[l]+f;
+                }
+                else if(((add[l]-'0')+carry)%2==0){
+                    f="0"+f;
+                    carry=1;
+                }
+                else{
+                    f="1"+final;
+                    carry=0;
+                }
+            }
+            result=f;
+        }
+        else{
+            result=add;
+        }
+    }
+    return oc(result);
+}
+
+/**
+ * The function takes in a string, a block size, and a checksum. It then calculates the checksum of the
+ * string and the checksum, and if the checksum of the string and the checksum is all zeros, it returns
+ * true, otherwise it returns false
+ * 
+ * @param sent the message sent by the sender
+ * @param rcv The received message
+ * @param block the size of the checksum
+ * 
+ * @return a boolean value.
+ */
+bool chkr(string sent, string rcv, int block){
+    srting sndr_chksm=chksm(sent,block);
+
+    string rcv_chksm=chksm(rcv+sndr_chksm,block);
+
+    if(count(rcv_chksm.begin(),rcv_chksm.end(),'0')==block){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
